@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="shift_jis" standalone="yes"?>
+<BHT_Solution_Information>
+  <OpenFileInformation>
+    <OpenInfo>
+      <FileName>main</FileName>
+      <EditorType>0</EditorType>
+    </OpenInfo>
+  </OpenFileInformation>
+  <SolutionExpand>
+    <ProjectExpands>
+      <ProjectExpand>
+        <Name>handy</Name>
+        <Expand>0</Expand>
+        <SourceExpand>0</SourceExpand>
+        <IncludeExpand>0</IncludeExpand>
+        <LibraryExpand>0</LibraryExpand>
+      </ProjectExpand>
+    </ProjectExpands>
+    <RelatedExpand>0</RelatedExpand>
+  </SolutionExpand>
+</BHT_Solution_Information>

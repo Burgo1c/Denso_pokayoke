@@ -1,0 +1,29 @@
+          BHT-BASIC 4.0 Linker Version S.03
+          Copyright (C) DENSO WAVE INCORPORATED 2004 all right reserved
+
+WORK SYMBOL
+    BARCD%                         <main->                        310002
+    BARCHILD$                      <main->                        360002
+    BARLEN%                        <main->                        310001
+    BARPAR$                        <PUBLIC_>                      360000
+    BLACKCOLOR&                    <main->                        320007
+    BLUECOLOR&                     <main->                        320001
+    CYANCOLOR&                     <main->                        320006
+    GREENCOLOR&                    <main->                        320000
+    PURPLECOLOR&                   <main->                        320002
+    REDCOLOR&                      <main->                        320003
+    TEMPKEY$                       <main->                        360001
+    TEMPKEY%                       <main->                        310003
+    WHITECOLOR&                    <main->                        320004
+    YELLOWCOLOR&                   <main->                        320005
+
+OBJECT INFORMATION
+                                                  Offset     Size
+    PRC                                           00000000   00000100
+    REG                                           00000100   000000CE
+    PRD                                           000001CE   00000B7E
+
+PRD INFORMATION
+    [Filename]                                    Offset     Size
+    main.ob4                                      00000000   00000B7E   (00000000)
+    [Total]                                                  00000B7E

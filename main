@@ -1,0 +1,338 @@
+  '$include:'BHTDEF.INC' 'COLORS
+ 
+'DECLARE COLOR VARIABLES  
+ private whiteColor&
+ private redColor&
+ private greenColor&
+ private blueColor&
+ private blackColor&
+ private cyanColor&
+ private purpleColor&
+ private yellowColor&
+
+'CONSTANT VARIABLES
+const ver$ = "1.01.2"
+const title$ = "	ﾊﾝﾃﾞｲﾘｰﾀﾞｰ	"
+const domTitle$ = "		国内伝票		"		
+const expTitle$ = "		輸出伝票		"	
+const labTitle$ = "		荷札照合		"	
+const ok$ = "		OK		"
+const ng$ = "		NG		"
+const blank$ = "																				"
+
+'GLOBAL VARIABLES
+	public barpar$[255]
+	private barchild$[255]
+	private barlen%
+	private barcd%
+	private tempkey% 
+
+'|  初期設定 
+ '   out .pnBLTime, 255 	'BACKLIGHT 255秒
+    out &h60C0, 3
+    
+	key 30, "M" 'M1キー
+    key 31, "N" 'M2キー
+ 
+	'色・SET COLOR VARIABLES
+    whiteColor& = .grColor.White     
+    redColor& = .grColor.Red
+    greenColor& = .grColor.Green
+    blueColor& = .grColor.Blue
+    blackColor& = .grColor.Black
+    cyanColor& = .grColor.Cyan
+    purpleColor& = .grColor.Magenta
+    yellowColor& = .grColor.Yellow
+	
+    
+'メインメニュー
+main: 
+
+	while 1	
+		close #1
+		cls
+		beep 1,1,1,1
+		'画面表示
+		out &h6080,40
+    	screen 1,1
+   		locate 1,1
+		call  "GRAPH.FN3"  .fcSetTextColor cyanColor&,blackColor&
+    	print title$
+    	
+		screen 1,1
+		out &h6080,40
+		locate 1,5
+		call  "GRAPH.FN3"  .fcSetTextColor whiteColor&,  blackColor&
+		print "1:国内伝票"
+	
+		locate 1,10
+		print "2:輸出伝票"
+		
+		screen 0
+		out &h6080,1
+		locate 1,19
+		print "ver: "; ver$
+		
+		'キーを押すまで待つ
+		wait 0,&h01    
+		tempkey$ = inkey$
+		beep 1,1,1,1
+		out &h6080,1
+		select tempkey$
+			case "1":
+				barpar$ = ""
+				barchild$ = ""
+				cls
+				screen 1,0
+				out &h6080,30
+				call  "GRAPH.FN3"  .fcSetTextColor blackColor&, whiteColor&
+				locate 2,6
+				print "伝票をスキャン"
+				locate 2,9
+				print "してください"
+				gosub domesticcheck
+				
+			case "2": 
+				barpar$ = ""
+				barchild$ = ""
+				cls
+				screen 1,0
+				out &h6080,30
+				call  "GRAPH.FN3"  .fcSetTextColor blackColor&, whiteColor&
+				locate 2,6
+				print "伝票をスキャン"
+				locate 2,9
+				print "してください"
+				gosub exportcheck
+			end select
+			
+		wend	
+	return		
+
+'------------------
+'国内伝票をチェック
+'------------------
+domesticcheck
+	while 1
+	close #1
+		out &h6080,40
+    	screen 1,1
+   		locate 1,1
+		call  "GRAPH.FN3"  .fcSetTextColor cyanColor&,blackColor&
+    	print domtitle$
+		
+		screen 1,1
+		out &h6080,1
+		locate 1,20
+		call  "GRAPH.FN3"  .fcSetTextColor whiteColor&,  blackColor&
+	   	print "M1:メニュー"
+	   	locate 1,23
+	   	print "M2:クリア"
+	   	
+		open "BAR:" as #1 code "M" 'code 39
+	
+		wait 0,&h03 'スキャン・キーを待つ
+		beep 1,1,1,1
+		tempkey$ = inkey$
+		barlen% = loc(#1)
+		'スキャンする場合
+		screen 1,1
+		if (barlen% > 0) AND (barlen% <= 10) then
+			if(barpar$ = "") then
+				barpar$ = input$(barlen%, #1)
+				cls
+				locate 1,5
+				print "親:"; barpar$
+			else
+				cls
+				barchild$ = input$(barlen%, #1)
+				locate 1,5
+				print "親:"; barpar$
+				locate 1,8
+				print "子:"; barchild$
+				
+				'DO CHECK
+				if(barchild$ = barpar$) then
+					OUT &h6080, 40 
+					screen 1,6
+					locate 1,7
+					call  "GRAPH.FN3"  .fcSetTextColor whiteColor&,blueColor&
+					print ok$
+					beep 1,1,2,1
+				else	
+					OUT &h6080, 40 
+					screen 1,6
+					locate 1,7
+					call  "GRAPH.FN3"  .fcSetTextColor whiteColor&,redColor&
+					print ng$
+					beep 2,1,6,2
+				endif
+			endif
+		
+		end if
+		
+		if barlen% > 10 then
+			cls 
+			screen 1,1
+					locate 1,6
+					call  "GRAPH.FN3"  .fcSetTextColor redColor&,whiteColor&
+					print blank$
+					locate 1,8
+					print "国内用のバーコードを"
+					locate 1,10
+					print "読み込んでください。"
+					print "			してください。			"
+					locate 1,12
+					print blank$
+					locate 1,14
+					print blank$
+					beep 2,1,6,2
+		end if
+		'キーを押す場合
+		if (tempkey$ <>"") then
+			close #1
+			select tempkey$
+			case "M":
+				return
+			case "N":
+				barpar$ = ""
+				barchild$ = ""	
+				cls
+				screen 1,0
+				out &h6080,30
+				call  "GRAPH.FN3"  .fcSetTextColor blackColor&, whiteColor&
+				locate 2,6
+				print "伝票をスキャン"
+				locate 2,9
+				print "してください"
+			end select
+		endif
+		barchild$ = ""
+		close #1
+	wend
+
+
+'------------------
+'輸出伝票をチェック
+'------------------	
+exportcheck
+	while 1
+		close #1
+		out &h6080,40
+	    screen 1,1
+		locate 1,1
+		call  "GRAPH.FN3"  .fcSetTextColor cyanColor&,blackColor&
+		print expTitle$	
+		
+		screen 1,1
+		out &h6080,1
+		locate 1,20
+		call  "GRAPH.FN3"  .fcSetTextColor whiteColor&,  blackColor&
+	   	print "M1:メニュー"
+	   	locate 1,23
+	   	print "M2:クリア"
+	
+		open "BAR:" as #1 code "M"
+	
+		wait 0,&h03 'スキャン・キーを待つ
+		beep 1,1,1,1
+		tempkey$ = inkey$
+		barlen% = loc(#1)
+		'スキャンする場合
+		if (barlen% > 0) then
+		
+			if(barpar$ = "") then
+				if (barlen% = 16) then 
+					barpar$ = input$(barlen%, #1)
+					cls
+					screen 1,1
+					locate 1,5
+					print "親:"; barpar$
+				else
+					cls 
+					screen 1,1
+					locate 1,6
+					call  "GRAPH.FN3"  .fcSetTextColor redColor&,whiteColor&
+					print blank$
+					locate 1,8
+					print "輸出用のバーコードを"
+					locate 1,10
+					print "読み込んでください。"
+					print "			してください。			"
+					locate 1,12
+					print blank$
+					locate 1,14
+					print blank$
+					beep 2,1,6,2
+					
+				endif
+	
+			else
+				if (barlen% = 10) then 
+					cls
+					barchild$ = input$(barlen%, #1)
+					screen 1,1
+					locate 1,5
+					print "親:"; barpar$
+					locate 1,8
+					print "子:"; barchild$
+					
+					'DO CHECK
+					if(barchild$ = Left$(barpar$,10)) then
+						OUT &h6080, 40
+						screen 1,6
+						locate 1,7
+						call  "GRAPH.FN3"  .fcSetTextColor whiteColor&,blueColor&
+						print ok$
+						beep 1,1,2,1
+					else	
+						OUT &h6080, 40 
+						screen 1,6
+						locate 1,7
+						call  "GRAPH.FN3"  .fcSetTextColor whiteColor&,redColor&
+						print ng$
+						beep 2,1,6,2
+					endif
+				else	
+					cls 
+					screen 1,1
+					locate 1,6
+					call  "GRAPH.FN3"  .fcSetTextColor redColor&,whiteColor&
+					print blank$
+					locate 1,8
+					print "	子コードをスキャン	"
+					locate 1,10			
+					print "			してください。			"
+					locate 1,12
+					print blank$
+					locate 1,14
+					print blank$
+					beep 2,1,6,2
+				endif
+			end if
+				
+		endif
+		'キーを押す場合
+		if (tempkey$ <>"") then
+			close #1
+			select tempkey$
+				case "M":
+					return  
+				case "N":
+					barpar$ = ""
+					barchild$ = ""
+					cls
+					screen 1,0
+					out &h6080,30
+					call  "GRAPH.FN3"  .fcSetTextColor blackColor&, whiteColor&
+					locate 2,6
+					print "伝票をスキャン"
+					locate 2,9
+					print "してください"
+			end select
+		endif
+		barchild$ = ""
+		close #1
+	wend  
+
+		

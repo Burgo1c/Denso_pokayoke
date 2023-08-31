@@ -1,0 +1,63 @@
+FUNCTION domesticcheck
+
+	private barlen%
+	private bardatapar$
+	private bardatachild$
+	private barcd%
+
+	
+	tempkey$ = inkey$
+	
+	barcd% = 0
+
+	open "BAR:CB" as #1 code "K"
+	
+	while 1
+		
+		wait 0,&h03  'バーコード読み取り完了かキーが押されるまで待つ
+		
+		cls 'clear screen
+		
+		barlen% = loc(#1)
+		if barlen% > 0 then
+		
+			beep 1,1,1,1
+			
+			if barcd% = 0 then
+				bardatapar$ = input$(barlen%, #1)
+				barcd% = 1 'change to child
+				print bardatapar$
+			else 
+				bardatachild$ = input$(barlen%, #1) 
+				barcd% = 0 'change to parent
+				print bardatachild$
+				'do check
+				
+				if bardatachild$ = bardatapar$ then
+					beep 2,1,1,1
+					print "コード照合：正"
+				else
+					beep 1,1,2,2
+					print "コード照合：不正"
+				end if
+							
+			end if
+			
+		else
+			
+			beep 1,1,2,2
+			print "もう一度スキャン"
+		  	print "してください"	
+		
+		endif
+		'キーを押すとメインメニューへ戻る
+		select tempkey$
+			case "31":
+				close #1
+				beep 3,1,1,1
+				gosub main	
+		end select	
+	wend
+
+
+end function
